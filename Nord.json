@@ -1,0 +1,45 @@
+{
+    "NumToStr": { 
+        "BACK": 0,
+        "NOMAL": 1,
+        "MACRO": 2,
+        "TYPE": 3,
+        "RESERVED": 8,
+        "OP": 9,
+        "COMMANDLINE": 10,
+        "SP_RESERVED": 13,
+        "COMMENT": 14,
+        "FUNCTION": 15,
+        "NOMAL_MODE": 21,
+        "INSERT_MODE": 22,
+        "COMMAND_MODE": 23,
+        "LINENUM": 24,
+        "NUM": 26,
+        "NUMBER": 26
+    },
+    "const": {
+        "BACK": [46, 52, 64],
+        "NOMAL": [207, 214, 228],
+        "MACRO": [136, 192, 208], 
+        "TYPE": [129, 161, 193],
+        "RESERVED": [94, 129, 172],
+        "OP": [97, 151, 162],
+        "COMMANDLINE": [207, 214, 228],
+        "SP_RESERVED": [163, 190, 140],
+        "COMMENT": [71, 85, 92],
+        "FUNCTION": [141, 188, 187],
+        "NOMAL_MODE": [129, 170, 230],
+        "INSERT_MODE": [180, 142, 173],
+        "COMMAND_MODE": [180, 142, 173],
+        "LINE": [76, 86, 106],
+        "NUM": [164, 121, 157],
+        "NUMBER": [164, 121, 157],
+        "LINENUM": [76, 86, 106]
+    },
+    "statusBar": {
+        "NOMAL_MODE": [129, 170, 230],
+        "INSERT_MODE": [180, 142, 173],
+        "COMMAND_MODE": [160, 190, 140]
+    }
+}
+
