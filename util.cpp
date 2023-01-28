@@ -30,7 +30,7 @@ void index(const string word, const vector<char> vec) {
     bool passd = false;
 
     for (;gIndex < vec.size() && !passd;)
-        for (int i = 0; i<word.size()-1;i++)
+        for (int i = 0; i<word.size()-1;i++, display())
             if (!(passd = ((vec[gIndex++] != word[i]) == false)))
                 break;
 

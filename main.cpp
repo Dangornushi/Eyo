@@ -222,10 +222,14 @@ void wordJump() {
 }
 
 void newOpen() {
+/*
     clear();
     refresh();
     resetty();
+    *///
+    
     globalInit();
+    savetty();
     run();
 }
 
@@ -438,7 +442,6 @@ void commandMode() {
             		if (gBuf[gIndex] == '\n')
         				display();
 	        	}
-				//display();	        	
 	        }
 	        
         	break;
@@ -698,6 +701,7 @@ unordered_map<char, void (*)()> gAction = {
 
 void run() {
     ifstream ifs(gFileName, ios::binary);
+    gIndex = 0;
     gBuf.assign(istreambuf_iterator<char>(ifs), istreambuf_iterator<char>());
     gUndoBuf = gBuf;
     gUndoIndex = gIndex;
@@ -708,6 +712,7 @@ void run() {
     commandLineWord = " NOMAL ";
     finderData = {""};
     finderSwitch = false;
+    gPageStart = gPageEnd = 0;
 
     // split token
     if (!classical) {

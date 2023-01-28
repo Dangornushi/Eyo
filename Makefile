@@ -22,4 +22,3 @@ clean:
 ./build/move.o: move.cpp eyo.hpp
 ./build/util.o: util.cpp eyo.hpp
 ./build/visualMode.o: visualMode.cpp eyo.hpp
-

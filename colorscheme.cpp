@@ -23,6 +23,14 @@ int color_gen_fromVec(vector<int> rgb, int color) {
 
 void jsonToScheme() {
 	std::ifstream i("Nord.json");
+	
+	if (!i) {
+		clear();
+		refresh();
+		printw("Can't find colorschem: \n");
+		refresh();
+		exit(1);
+	}
 	json j;
 	i >> j;
 	
@@ -39,6 +47,7 @@ void jsonToScheme() {
 	for (auto itr = statusBar.begin(); itr != statusBar.end(); ++itr) {	
 		init_pair(StrToNum[itr->first], BACK, color_gen_fromVec(itr->second, StrToNum[itr->first]));
 	}	
+	i.close();
 }
 
 void backChange() {
