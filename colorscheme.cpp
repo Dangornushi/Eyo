@@ -22,15 +22,9 @@ int color_gen_fromVec(vector<int> rgb, int color) {
 }
 
 void jsonToScheme() {
+	//std::ifstream i("~/.config/eyo/Nord.json");
 	std::ifstream i("Nord.json");
 	
-	if (!i) {
-		clear();
-		refresh();
-		printw("Can't find colorschem: \n");
-		refresh();
-		exit(1);
-	}
 	json j;
 	i >> j;
 	

@@ -172,7 +172,7 @@ void save() {
     ofstream ofs(gFileName, ios::binary);
     ostream_iterator<char> output_iterator(ofs);
     copy(gBuf.begin(), gBuf.end(), output_iterator);
-    commandLineWord = "===--- saved ---===";
+    commandLineWord = "saved";
     redraw();
 }
 
@@ -214,10 +214,7 @@ void wordJump() {
         }
         commandLineWord = jumpWordBuf;
     }
-    if (jumpWordBuf[0] == '$') {
-        system(jumpWordBuf.erase(0, 1).c_str());
-    }
-    else index(jumpWordBuf, gBuf);
+    index(jumpWordBuf, gBuf);
     redraw();
 }
 
@@ -322,25 +319,36 @@ void commandLineLs() {
     reverse(lsData.end(), lsData.begin());
     char ch = 'a';
     int scrollBase = 0;
-    int commandRow = 10;
+    int commandRow = h-1;
 
     for (;;) {
-        int i = h - 2;
-        for (int j = scrollBase; j < 10 + scrollBase; j++) {
-            if (j > lsData.size()) break;
+        int i = 0;
+        int j = scrollBase;
+        int fileNameWidth = 20;
+		
+        for (;j < scrollBase || j < lsData.size(); j++) {
             attrset(COLOR_PAIR(NOMAL));
             mvaddstr(i, 1, lsData[j].c_str());
             attrset(COLOR_PAIR(BACK));
-            for (int k = lsData[j].length() + 1; k < w; k++)
+            
+			int k = lsData[j].length() + 1;
+            for (; k < fileNameWidth; k++)
                 mvaddstr(i, k, " ");
-            i--;
+            attrset(COLOR_PAIR(nowMode));
+            mvaddstr(i, k, " ");
+            i++;   
         }
-
-        attrset(COLOR_PAIR(COMMANDLINE));
-        for (int j = 0; j < w; j++) mvaddstr(i, j, " ");
-
-        refresh();
-        if (input(&scrollBase, lsData, commandRow)) break;
+        for (;i < h-1; i++) {
+			int tw=0;
+			attrset(COLOR_PAIR(BACK));
+            for (;tw<fileNameWidth;tw++) {
+                mvaddstr(i, tw, " ");
+            }
+			attrset(COLOR_PAIR(nowMode));
+            mvaddstr(i, tw, " ");            
+       }
+       refresh();
+       if (input(&scrollBase, lsData, commandRow)) break;
     }
     resetty();
     return;
@@ -419,12 +427,7 @@ void commandMode() {
     		gotoLine = stoi(inputBox());
     		
     		int i = 0;
-    		int gMinN = gotoLine - nowLineNum;    		    		
-    		
-    		/*
-    		
-    		*///
-    		
+    		int gMinN = gotoLine - nowLineNum; 		
     		
 	        if (gMinN > 0) {
 				gIndex = 0;
@@ -550,6 +553,16 @@ void insertMode() {
                 (gBuf[gIndex] == '\'' && gBuf[gIndex + 1] == '\'')) {
                 gBuf.erase(gBuf.begin() + (gIndex + 1));
             }
+            
+            else if ((gBuf[gIndex-1] == '(' && gBuf[gIndex] == ')') ||
+                (gBuf[gIndex-1] == '{' && gBuf[gIndex] == '}') ||
+                (gBuf[gIndex-1] == '[' && gBuf[gIndex] == ']') ||
+                (gBuf[gIndex-1] == '"' && gBuf[gIndex] == '"') ||
+                (gBuf[gIndex-1] == '\'' && gBuf[gIndex] == '\'')) {
+                    gIndex+=2;                
+                    continue;
+            }
+
 
             gBuf.erase(gBuf.begin() + (gIndex));
             if (nowInputWord.size() > 0)
@@ -696,7 +709,6 @@ unordered_map<char, void (*)()> gAction = {
     {'p', paste},
     {'a', addInsert},
     {'u', undo},
-
 };
 
 void run() {
