@@ -36,7 +36,6 @@ void display() {
 
     gPageEnd = gPageStart;
 
-    drawInDir(finderSwitch, lineNumberString, y);
     drawLinenumAndFinder(&lineNumberString, &c, AllLineLength);
 
     nowLineBuf = lineNumberString.size() + 1;
@@ -67,7 +66,7 @@ void display() {
             }
 
             if (*p == '\n' || COLS <= x) {
-                drawInDir(finderSwitch, lineNumberString, ++y);
+//                drawInDir(finderSwitch, lineNumberString, ++y);
                 drawLinenumAndFinder(&lineNumberString, &c, AllLineLength);
 
                 x = 0;

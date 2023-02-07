@@ -1,4 +1,4 @@
-PRG    = ./build/eyo
+PRG = ./build/eyo
 OBJDIR = ./build/obj/
 OBJ    = main.o move.o display.o visualMode.o util.o finder.o colorscheme.o
 
@@ -8,6 +8,7 @@ CC     =  g++ $(CFLAGS)
 
 $(PRG) : $(OBJ)
 	$(CC) -o $@ $^ $(LFLAGS)
+	cp build/eyo /usr/local/bin/.
 
 .cpp.o:
 	$(CC) -c $<
@@ -22,3 +23,6 @@ clean:
 ./build/move.o: move.cpp eyo.hpp
 ./build/util.o: util.cpp eyo.hpp
 ./build/visualMode.o: visualMode.cpp eyo.hpp
+
+
+

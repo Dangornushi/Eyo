@@ -110,5 +110,5 @@ extern int nowWindow;
 extern int windows;
 extern int visualStart;
 extern int visualEnd;
-
+extern int finderDrawBuf;
 

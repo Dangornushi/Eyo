@@ -41,7 +41,7 @@ int adjust(const int inOffset, const int inCol) {
 
 // minimal Move Commands
 void left()      { if (gBuf[gIndex-1] != '\n')--gIndex;}
-void right()     { if (gBuf[gIndex] != '\n')++gIndex;}
+void right()     { if (gBuf[gIndex+1] != '\n')++gIndex;}
 void up()        { gIndex = adjust(lineTop(lineTop(gIndex) - 1), gCol); }// <- 行数を一つマイナス
 void down()      { gIndex = adjust(nextLineTop(gIndex), gCol); }// <- 行数を一つ追加
 void gotoUp()    { gIndex = adjust(gPageStart, 0);} // <- ページの最上部に移動 
