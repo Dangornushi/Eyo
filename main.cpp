@@ -269,14 +269,15 @@ bool input(int *scrollBase, vector<string> lsData, int commandRow) {
     while (1) {
         switch (ch = getch()) {
             case 'k': {
-                (*scrollBase > 0 && lsData.size() > h-2) ? (*scrollBase)-- : 0;
+                (*scrollBase > 0 ) ? (*scrollBase)-- : 0;
                 return false;
             }
             case 'j': {
-                if (*scrollBase < lsData.size() - commandRow && lsData.size() > h-2) (*scrollBase)++;
+                if (*scrollBase < lsData.size()-1) (*scrollBase)++;
                 return false;
             }
             case '\n': {
+                fileNum = to_string(*scrollBase+1);
                 gFileName = lsData.at(stoi(fileNum) - 1)
                                 .erase(0, fileNum.length() + 1)
                                 .c_str();
@@ -288,13 +289,10 @@ bool input(int *scrollBase, vector<string> lsData, int commandRow) {
                 gLines = 0;
                 curs_set(1);
                 run();
+                exit(0);
                 return true;
             }
             default:
-                if (isdigit(ch)) {
-                    fileNum += ch;
-                    continue;
-                }
                 finderDrawBuf = 0;
                 finderSwitch = false;
                 return true;
@@ -338,7 +336,7 @@ void commandLineLs() {
     
     for (;;) {
         int i = 0;
-        int j = scrollBase;		
+        int j = 0;		
         
         attrset(COLOR_PAIR(NOMAL));
         int tw=0;
@@ -348,24 +346,25 @@ void commandLineLs() {
        
         // フォルダ内のファイル名を描写
         for (;j < lsData.size(); j++) {
-           int k = lsData[j].length() + 2; 
-           if (i > h-3) break;
+            int k = lsData[j].length() + 2; 
+            if (i > h-3) break;
            	
-           // 左側の縦枠を描写
-           attrset(COLOR_PAIR(NOMAL));
-           mvaddstr(i, 1, "|");
+            // 左側の縦枠を描写
+            attrset(COLOR_PAIR(NOMAL));
+            mvaddstr(i, 1, "|");
             
-           // ファイルあるいはディレクトリないの何かの名前を描写
-           mvaddstr(i, 2, lsData[j].c_str());
-           for (; k < fileNameWidth;mvaddstr(i, k++, " "));
+            if (j == scrollBase)
+            	attrset(COLOR_PAIR(NOMAL_MODE));
+            // ファイルあるいはディレクトリないの何かの名前を描写
+            mvaddstr(i, 2, lsData[j].c_str());
+            for (; k < fileNameWidth;mvaddstr(i, k++, " "));
                       	
-           // 右側の縦枠を描写
-           attrset(COLOR_PAIR(NOMAL));
-           mvaddstr(i, k, "| ");
+            // 右側の縦枠を描写
+            attrset(COLOR_PAIR(NOMAL));
+            mvaddstr(i, k, "| ");
            
-           // 高さを一つ下げる
-           i++;   
-           
+            // 高さを一つ下げる
+            i++;
        }
         
        // 余分な空白を描写

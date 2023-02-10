@@ -48,7 +48,10 @@ void gotoUp()    { gIndex = adjust(gPageStart, 0);} // <- ページの最上部�
 void gotoDown()  { gIndex = adjust(gPageEnd-1, 0);} // <- ページの最下部に移動
 void lineBegin() { gIndex = lineTop(gIndex); } // <- 行の始めに移動
 void lineEnd()   { while (gBuf[gIndex] != '\n') gIndex++;} // <- 行の最後に移動
-void top()       { gIndex = 0; } // <- ファイルの始めに移動
+void top()       { 
+	for (;gIndex > 0;gIndex--)
+		display();
+} // <- ファイルの始めに移動
 void bottom()    { gIndex = gBuf.size() - 1; } // <- ファイルの最後に移動
 void del()       { if (gIndex < gBuf.size() - 1) gBuf.erase(gBuf.begin() + gIndex);} // <- ファイルバッファから一つ削除
 void quit()      { gDone = true; }  // <- エディタの終了
