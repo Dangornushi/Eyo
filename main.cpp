@@ -43,6 +43,7 @@ int visualStart;
 int visualEnd;
 bool classical;
 bool finderSwitch = false;
+bool terminalSwitch = false;
 
 void globalInit() {
     nowMode = NOMAL_MODE;
@@ -708,6 +709,101 @@ void windowChange() {
     (windows > nowWindow && windows > 1) ? nowWindow++ : nowWindow = 0;
 }
 
+int drawLine(int x, int rimit) {
+	mvaddstr(x, 0, " ");
+	for (int i=1;i<rimit-1;i++) {
+		mvaddstr(x, i, "-");
+	}
+	mvaddstr(x, rimit, " ");
+	return x++;
+}
+
+void printlnInTerminal(string word, int *x, int *y) {
+	mvaddstr(*y, *x, word.c_str());
+	
+	for (*x += word.length();*x<w-1;(*x)++) {
+		mvaddstr(*y, *x, " ");
+	}
+	
+	mvaddstr(*y, *x, "\n");
+}
+
+bool ExecCmd(const char* cmd, std::string& stdOut, int& exitCode) {
+	std::shared_ptr<FILE> pipe(popen(cmd, "r"), [&](FILE* p) {exitCode = pclose(p); });
+	if (!pipe) {
+		return false;
+	}
+	std::array<char, 256> buf;
+	while (!feof(pipe.get())) {
+		if (fgets(buf.data(), buf.size(), pipe.get()) != nullptr) {
+			stdOut += buf.data();
+		}
+	}
+	return true;
+}
+                                                                            
+void terminal() {
+
+    if (!terminalSwitch) {
+		return;
+	}
+
+	int terminalHeight = 20;
+	int terminalWidth = w;
+	int terminalInputIndex = 0;
+	vector<string> terminalPutBuf (terminalHeight, "");
+	
+	for (;;) {
+		int startHeight = h - terminalHeight;	
+		
+		display();
+		
+		startHeight = drawLine(startHeight, terminalWidth);	
+		startHeight++;
+		
+		
+		for (int terminalPutBufIndex=0;startHeight < h-2;startHeight++, terminalPutBufIndex++) {	
+			int x = 0;
+			mvaddstr(startHeight, x++, "|");
+			printlnInTerminal(terminalPutBuf.at(terminalPutBufIndex), &x, &startHeight);
+			mvaddstr(startHeight, x, "|");
+		}	
+		
+		startHeight = drawLine(startHeight, terminalWidth);
+	
+		refresh();	
+		
+		int ch = getch();
+		switch (ch) {
+			case kESC: {
+				terminalSwitch = false;
+				return;
+				//break;
+			}
+			case '\n': {
+				// 適当なコマンドを用意する
+				const char* cmd = "echo Hello";
+				std::string stdOut;
+				int exitCode;
+				if (ExecCmd(cmd, stdOut, exitCode)) {
+					
+					terminalPutBuf.at(++terminalInputIndex) = stdOut;
+					terminalInputIndex++;
+				}
+				else {
+					exit(1);
+					//std::cout << "標準出力の取得に失敗しました。" << std::endl;
+				}
+				break;
+			}
+			default: {
+				terminalPutBuf.at(terminalInputIndex).push_back(ch);
+				break;
+			}
+		}
+	}
+}
+
 void finderOn() {
 	finderDrawBuf = 0;
     if (finderSwitch == true) {
@@ -717,6 +813,13 @@ void finderOn() {
         finderSwitch = true;
     }
 }
+
+void terminalOn() {
+	if (terminalSwitch)
+		terminalSwitch = false;
+	else
+		terminalSwitch = true;
+} 
 
 unordered_map<char, void (*)()> gAction = {
     {'h', left},
@@ -754,6 +857,7 @@ unordered_map<char, void (*)()> gAction = {
     {'p', paste},
     {'a', addInsert},
     {'u', undo},
+    {kCtrlJ, terminalOn},
 };
 
 void run() {
@@ -804,6 +908,7 @@ void run() {
 
     // start
     while (!gDone) {
+        terminal();
         commandLineLs();
         display();
         char ch = getch();

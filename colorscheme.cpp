@@ -8,22 +8,24 @@ short G;
 short B;
 
 int RGB_buf = 4;  // 215686274509802;
+int buf_2 = 6;
 
 #define BACK 0
 
 int color_gen(int r, int g, int b, int color) {
-    init_color(color, r * RGB_buf, g * RGB_buf, b * RGB_buf);
+    init_color(color, (r-buf_2) * RGB_buf, (g-buf_2) * RGB_buf, (b-buf_2) * RGB_buf);
     return color;
 }
 
 int color_gen_fromVec(vector<int> rgb, int color) {
-    init_color(color, rgb[0] * RGB_buf, rgb[1] * RGB_buf, rgb[2] * RGB_buf);
+    init_color(color, (rgb[0]-buf_2) * RGB_buf, (rgb[1]-buf_2) * RGB_buf, (rgb[2]-buf_2) * RGB_buf);
     return color;
 }
 
 void jsonToScheme() {
 	//std::ifstream i("~/.config/eyo/Nord.json");
-	std::ifstream i("Nord.json");
+//	std::ifstream i("Theme.json");
+	std::ifstream i("Nord.json");	
 	
 	json j;
 	i >> j;
@@ -31,18 +33,26 @@ void jsonToScheme() {
 	map<string, int> StrToNum = j["NumToStr"];
 	map<string, vector<int>> colors = j["const"];
 	map<string, vector<int>> statusBar = j["statusBar"];
-	
+	map<string, vector<int>> back = j["back"];
+
 	// ColorScheme
 	for (auto itr = colors.begin(); itr != colors.end(); ++itr) {	
-		init_pair(StrToNum[itr->first], color_gen_fromVec(itr->second, StrToNum[itr->first]), BACK);
+		init_pair(StrToNum[itr->first], color_gen_fromVec(itr->second, StrToNum[itr->first]), BACK);	
 	}
 
 	// AirLine
 	for (auto itr = statusBar.begin(); itr != statusBar.end(); ++itr) {	
 		init_pair(StrToNum[itr->first], BACK, color_gen_fromVec(itr->second, StrToNum[itr->first]));
-	}	
+	}		
+	
+	// Back
+	for (auto itr = back.begin(); itr != back.end(); ++itr) {	
+		color_gen_fromVec(itr->second, StrToNum[itr->first]);	
+	}
+
 	i.close();
 }
+	 
 
 void backChange() {
      // Air line     
@@ -52,9 +62,7 @@ void backChange() {
     init_pair(VARIABLE, 0x74, BACK);
 
 	jsonToScheme();
-
-    color_gen(46, 52, 64, BACK);
-
+	
     return;
  }
 

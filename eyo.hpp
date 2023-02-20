@@ -9,6 +9,7 @@
 #include <unordered_map>
 #include <vector>
 #include <string>
+#include <array>
 
 #define NOMAL_M 0
 #define INSERT_M 1
@@ -54,6 +55,7 @@ enum {
     kCtrlSpace = 0,
     kCtrlD = 4,
     kCtrlF = 6,
+    kCtrlJ = 10,
     kEnter = 13,
     kCtrlN = 14,
     kCtrlP = 16,
