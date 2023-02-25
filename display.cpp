@@ -15,8 +15,8 @@ void display() {
         gPageStart = lineTop(gIndex);
     }
 
-    else if(gPageEnd<=gIndex && gIndex < gBuf.size() && gRow >= h-2)  {
-        ( gLines > h-2 ) ? LineStart++ : 0;
+    else if(gPageEnd<=gIndex && gIndex < gBuf.size() && gRow >= h-1)  {
+        ( gLines > h ) ? LineStart++ : 0;
         gPageStart=nextLineTop(gIndex);
         int n = LINES;
         for(int i=1; i<n; i++) { gPageStart=lineTop(gPageStart-1); }
@@ -25,7 +25,7 @@ void display() {
     move(0, 0);
 
     int x = 0;
-    int y = 0;
+    int y = 1;
     int tokenCounter = 0;
     int nowToken = 0;
     int tmpLineBuf = nowLineBuf;
@@ -33,7 +33,24 @@ void display() {
     string lineNumberString;
     bool nowComment = false;
     bool nowConsecutiveComment = false;
+    
+    
+	// ツールバー
+	string filename = gFileName;
+    string cursorRow = " " + filename + " ";
+    int consoleRow = 0; // ツールバーがある高さ
 
+    attrset(COLOR_PAIR(nowMode));
+    mvaddstr(consoleRow, 0, commandLineWord.c_str());
+    attrset(COLOR_PAIR(COMMANDLINE));
+
+    for (auto j=commandLineWord.size(); j < COLS - cursorRow.size();)
+        mvaddstr(consoleRow, j++, " ");
+
+    attrset(COLOR_PAIR(NOMAL));
+    mvaddstr(consoleRow, COLS - cursorRow.size(), cursorRow.c_str());
+    // 
+    
     gPageEnd = gPageStart;
 
     drawLinenumAndFinder(&lineNumberString, &c, AllLineLength);
@@ -48,7 +65,7 @@ void display() {
             gCol = x;
         } 
 
-        if (y == h - 1 || gBuf.size() <= gPageEnd) {
+        if (y == h || gBuf.size() <= gPageEnd) {
             break;
         }
 
@@ -66,9 +83,7 @@ void display() {
             }
 
             if (*p == '\n' || COLS <= x) {
-//                drawInDir(finderSwitch, lineNumberString, ++y);
                 drawLinenumAndFinder(&lineNumberString, &c, AllLineLength);
-
                 x = 0;
             }
             continue;
@@ -155,28 +170,15 @@ void display() {
 
     }
 
+	// 余白
     move(y, 0);
-
-    while (y < h-1) { 
+    
+    while (y < h) { 
         drawInDir(finderSwitch, lineNumberString, y++);
         lineNumberString = "~\n";
         drawTildeAndFinder(&lineNumberString,  AllLineLength);
     }
-
-    string fileName = gFileName;
-    string cursorRow = " " + fileName + " " + to_string(nowLineNum) + "*" + to_string(gCol+1) + " ";
-    int consoleRow = h - 1;
-
-    attrset(COLOR_PAIR(nowMode));
-    mvaddstr(consoleRow, 0, commandLineWord.c_str());
-    attrset(COLOR_PAIR(COMMANDLINE));
-
-    for (auto j=commandLineWord.size(); j < COLS - cursorRow.size();)
-        mvaddstr(consoleRow, j++, " ");
-
-    attrset(COLOR_PAIR(NOMAL));
-    mvaddstr(consoleRow, COLS - cursorRow.size(), cursorRow.c_str());
-    clrtobot();
+    // 
 
     // カーソルの表示
     move(gRow, gCol+nowLineBuf);

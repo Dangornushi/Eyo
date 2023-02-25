@@ -465,7 +465,7 @@ void commandMode() {
 				gIndex = 0;
         		for (int lineCounter=1;gIndex<gBuf.size();gIndex++) {
         			if (gBuf[gIndex] == '\n') {	
-						display();
+						//display();
 						if (lineCounter<gotoLine)
 							lineCounter++;	
 						else 
@@ -474,9 +474,12 @@ void commandMode() {
 	        	}
         	} else {
         		for (int lineCounter=1;gIndex>-(nowLineNum-gMinN);gIndex--) {
+            		/*
             		if (gBuf[gIndex] == '\n')
-        				display();
+        				display();	
+				*///
 	        	}
+	        	
 	        }
 	        
         	break;
@@ -709,13 +712,13 @@ void windowChange() {
     (windows > nowWindow && windows > 1) ? nowWindow++ : nowWindow = 0;
 }
 
-int drawLine(int x, int rimit) {
-	mvaddstr(x, 0, " ");
+int drawLine(int y, int rimit) {
+	mvaddstr(y, 0, " ");
 	for (int i=1;i<rimit-1;i++) {
-		mvaddstr(x, i, "-");
+		mvaddstr(y, i, "-");
 	}
-	mvaddstr(x, rimit, " ");
-	return x++;
+	mvaddstr(y, rimit, " ");
+	return y++;
 }
 
 void printlnInTerminal(string word, int *x, int *y) {
@@ -728,8 +731,8 @@ void printlnInTerminal(string word, int *x, int *y) {
 	mvaddstr(*y, *x, "\n");
 }
 
-bool ExecCmd(const char* cmd, std::string& stdOut, int& exitCode) {
-	std::shared_ptr<FILE> pipe(popen(cmd, "r"), [&](FILE* p) {exitCode = pclose(p); });
+bool ExecCmd(string cmd, string& stdOut, int& exitCode) {
+	std::shared_ptr<FILE> pipe(popen(cmd.c_str(), "r"), [&](FILE* p) {exitCode = pclose(p); });
 	if (!pipe) {
 		return false;
 	}
@@ -741,8 +744,28 @@ bool ExecCmd(const char* cmd, std::string& stdOut, int& exitCode) {
 	}
 	return true;
 }
+
+string runCommand(string command, int* index) {
+	string ret = "";
+	string stdOut = "";
+	int exitCode = 0;
+				
+		
+	if (ExecCmd(command, stdOut, exitCode)) {
+		if (stdOut == "")
+			stdOut = "code: 0\n";
+		for (int i=0;i<stdOut.size();i++) {
+			if (stdOut.at(i) == '\n')
+				(*index)++;
+			else
+				ret += stdOut.at(i);
+		}
+		return ret;
+	}
+	exit(1);
+}
                                                                             
-void terminal() {
+void terminal(string startCommand) {
 
     if (!terminalSwitch) {
 		return;
@@ -751,22 +774,23 @@ void terminal() {
 	int terminalHeight = 20;
 	int terminalWidth = w;
 	int terminalInputIndex = 0;
-	vector<string> terminalPutBuf (terminalHeight, "");
+	vector<string> terminalPutBuf (terminalHeight, "");	
+
+	terminalPutBuf.at(0) = runCommand(startCommand, &terminalInputIndex);
 	
-	for (;;) {
+	for (;;) {	
 		int startHeight = h - terminalHeight;	
 		
 		display();
 		
 		startHeight = drawLine(startHeight, terminalWidth);	
-		startHeight++;
+		startHeight++;	
 		
-		
-		for (int terminalPutBufIndex=0;startHeight < h-2;startHeight++, terminalPutBufIndex++) {	
+		for (int terminalPutBufIndex=0;startHeight < h-2;) {	
 			int x = 0;
 			mvaddstr(startHeight, x++, "|");
-			printlnInTerminal(terminalPutBuf.at(terminalPutBufIndex), &x, &startHeight);
-			mvaddstr(startHeight, x, "|");
+			printlnInTerminal(terminalPutBuf.at(terminalPutBufIndex++), &x, &startHeight);
+			mvaddstr(startHeight++, x, "|");
 		}	
 		
 		startHeight = drawLine(startHeight, terminalWidth);
@@ -778,22 +802,18 @@ void terminal() {
 			case kESC: {
 				terminalSwitch = false;
 				return;
-				//break;
+			}
+			case 127: {
+				terminalPutBuf.at(terminalInputIndex).pop_back();
+				
+				break;
 			}
 			case '\n': {
 				// 適当なコマンドを用意する
-				const char* cmd = "echo Hello";
-				std::string stdOut;
-				int exitCode;
-				if (ExecCmd(cmd, stdOut, exitCode)) {
-					
-					terminalPutBuf.at(++terminalInputIndex) = stdOut;
-					terminalInputIndex++;
-				}
-				else {
-					exit(1);
-					//std::cout << "標準出力の取得に失敗しました。" << std::endl;
-				}
+				string resultStr = runCommand(terminalPutBuf.at(terminalInputIndex), &terminalInputIndex);
+				
+				terminalPutBuf.at(terminalInputIndex++) = resultStr;
+				
 				break;
 			}
 			default: {
@@ -908,7 +928,7 @@ void run() {
 
     // start
     while (!gDone) {
-        terminal();
+        terminal("echo hello");
         commandLineLs();
         display();
         char ch = getch();

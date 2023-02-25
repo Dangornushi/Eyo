@@ -50,9 +50,12 @@ void lineBegin() { gIndex = lineTop(gIndex); } // <- 行の始めに移動
 void lineEnd()   { while (gBuf[gIndex] != '\n') gIndex++;} // <- 行の最後に移動
 void top()       { 
 	for (;gIndex > 0;gIndex--)
-		display();
+		if (gBuf[gIndex] == '\n') display();
 } // <- ファイルの始めに移動
-void bottom()    { gIndex = gBuf.size() - 1; } // <- ファイルの最後に移動
+void bottom()    {
+	for (;gIndex < gBuf.size()-1;gIndex++)
+		if (gBuf[gIndex] == '\n') display();
+} // <- ファイルの最後に移動
 void del()       { if (gIndex < gBuf.size() - 1) gBuf.erase(gBuf.begin() + gIndex);} // <- ファイルバッファから一つ削除
 void quit()      { gDone = true; }  // <- エディタの終了
 void redraw()    { clear(); display(); } // <- メインウィンドウの書き直しとレフレッシュ
