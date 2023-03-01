@@ -41,15 +41,21 @@ int adjust(const int inOffset, const int inCol) {
 
 // minimal Move Commands
 void left()      { if (gBuf[gIndex-1] != '\n')--gIndex;}
-void right()     { if (gBuf[gIndex] != '\n')++gIndex;}
+void right()     { if (gBuf[gIndex+1] != '\n')++gIndex;}
 void up()        { gIndex = adjust(lineTop(lineTop(gIndex) - 1), gCol); }// <- 行数を一つマイナス
 void down()      { gIndex = adjust(nextLineTop(gIndex), gCol); }// <- 行数を一つ追加
 void gotoUp()    { gIndex = adjust(gPageStart, 0);} // <- ページの最上部に移動 
 void gotoDown()  { gIndex = adjust(gPageEnd-1, 0);} // <- ページの最下部に移動
 void lineBegin() { gIndex = lineTop(gIndex); } // <- 行の始めに移動
 void lineEnd()   { while (gBuf[gIndex] != '\n') gIndex++;} // <- 行の最後に移動
-void top()       { gIndex = 0; } // <- ファイルの始めに移動
-void bottom()    { gIndex = gBuf.size() - 1; } // <- ファイルの最後に移動
+void top()       { 
+	for (;gIndex > 0;gIndex--)
+		if (gBuf[gIndex] == '\n') display();
+} // <- ファイルの始めに移動
+void bottom()    {
+	for (;gIndex < gBuf.size()-1;gIndex++)
+		if (gBuf[gIndex] == '\n') display();
+} // <- ファイルの最後に移動
 void del()       { if (gIndex < gBuf.size() - 1) gBuf.erase(gBuf.begin() + gIndex);} // <- ファイルバッファから一つ削除
 void quit()      { gDone = true; }  // <- エディタの終了
 void redraw()    { clear(); display(); } // <- メインウィンドウの書き直しとレフレッシュ

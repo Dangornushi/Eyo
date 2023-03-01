@@ -25,6 +25,7 @@ int gLines;
 int gCol, gRow;
 int gUndoIndex = 0;
 
+int finderDrawBuf = 0;
 int nowLineNum = 1;
 int LineStart;
 int LineEnd;
@@ -41,7 +42,8 @@ int windows;
 int visualStart;
 int visualEnd;
 bool classical;
-bool finderSwitch;
+bool finderSwitch = false;
+bool terminalSwitch = false;
 
 void globalInit() {
     nowMode = NOMAL_MODE;
@@ -172,7 +174,7 @@ void save() {
     ofstream ofs(gFileName, ios::binary);
     ostream_iterator<char> output_iterator(ofs);
     copy(gBuf.begin(), gBuf.end(), output_iterator);
-    commandLineWord = "===--- saved ---===";
+    commandLineWord = "saved";
     redraw();
 }
 
@@ -214,18 +216,19 @@ void wordJump() {
         }
         commandLineWord = jumpWordBuf;
     }
-    if (jumpWordBuf[0] == '$') {
-        system(jumpWordBuf.erase(0, 1).c_str());
-    }
-    else index(jumpWordBuf, gBuf);
+    index(jumpWordBuf, gBuf);
     redraw();
 }
 
 void newOpen() {
+/*
     clear();
     refresh();
     resetty();
+    *///
+    
     globalInit();
+    savetty();
     run();
 }
 
@@ -266,15 +269,16 @@ bool input(int *scrollBase, vector<string> lsData, int commandRow) {
     string fileNum = "";
     while (1) {
         switch (ch = getch()) {
-            case 'j': {
-                (*scrollBase > 0) ? (*scrollBase)-- : 0;
+            case 'k': {
+                (*scrollBase > 0 ) ? (*scrollBase)-- : 0;
                 return false;
             }
-            case 'k': {
-                if (*scrollBase < lsData.size() - commandRow) (*scrollBase)++;
+            case 'j': {
+                if (*scrollBase < lsData.size()-1) (*scrollBase)++;
                 return false;
             }
             case '\n': {
+                fileNum = to_string(*scrollBase+1);
                 gFileName = lsData.at(stoi(fileNum) - 1)
                                 .erase(0, fileNum.length() + 1)
                                 .c_str();
@@ -284,15 +288,14 @@ bool input(int *scrollBase, vector<string> lsData, int commandRow) {
                 nowLineNum = 1;
                 nowLineBuf = 1;
                 gLines = 0;
+                curs_set(1);
                 run();
+                exit(0);
                 return true;
             }
             default:
-                if (isdigit(ch)) {
-                    fileNum += ch;
-                    continue;
-                }
-                resetty();
+                finderDrawBuf = 0;
+                finderSwitch = false;
                 return true;
         }
         refresh();
@@ -300,8 +303,16 @@ bool input(int *scrollBase, vector<string> lsData, int commandRow) {
 }
 
 void commandLineLs() {
+
+    if (!finderSwitch) {
+		finderDrawBuf = 0;
+		return;
+	}
+
     vector<string> lsData;
-    savetty();
+    curs_set(0);
+    int fileNameWidth = 0;
+    
     try {
         int num = 1;
         fs::directory_iterator it{"."};
@@ -309,6 +320,7 @@ void commandLineLs() {
             string fileOrDir = entry.path().string();  //.erase(0, 2);
             fileOrDir = to_string(num++) + " " + fileOrDir.erase(0, 2);
             lsData.push_back(fileOrDir);
+            (fileOrDir.length() > fileNameWidth) ? fileNameWidth = fileOrDir.length()+2 : 0;
         }
     } catch (const fs::filesystem_error &e) {
         quit();
@@ -318,27 +330,64 @@ void commandLineLs() {
     reverse(lsData.end(), lsData.begin());
     char ch = 'a';
     int scrollBase = 0;
-    int commandRow = 10;
+    int commandRow = h-1;
 
+    finderDrawBuf = fileNameWidth;
+    display();	
+    
     for (;;) {
-        int i = h - 2;
-        for (int j = scrollBase; j < 10 + scrollBase; j++) {
-            if (j > lsData.size()) break;
+        int i = 0;
+        int j = 0;		
+        
+        attrset(COLOR_PAIR(NOMAL));
+        int tw=0;
+        mvaddstr(i, tw++, "  ");
+        for (tw++;tw<fileNameWidth;mvaddstr(i, tw++, "_"));
+        mvaddstr(i++, tw++, " ");
+       
+        // フォルダ内のファイル名を描写
+        for (;j < lsData.size(); j++) {
+            int k = lsData[j].length() + 2; 
+            if (i > h-3) break;
+           	
+            // 左側の縦枠を描写
             attrset(COLOR_PAIR(NOMAL));
-            mvaddstr(i, 1, lsData[j].c_str());
-            attrset(COLOR_PAIR(BACK));
-            for (int k = lsData[j].length() + 1; k < w; k++)
-                mvaddstr(i, k, " ");
-            i--;
-        }
-
-        attrset(COLOR_PAIR(COMMANDLINE));
-        for (int j = 0; j < w; j++) mvaddstr(i, j, " ");
-
-        refresh();
-        if (input(&scrollBase, lsData, commandRow)) break;
+            mvaddstr(i, 1, "|");
+            
+            if (j == scrollBase)
+            	attrset(COLOR_PAIR(NOMAL_MODE));
+            // ファイルあるいはディレクトリないの何かの名前を描写
+            mvaddstr(i, 2, lsData[j].c_str());
+            for (; k < fileNameWidth;mvaddstr(i, k++, " "));
+                      	
+            // 右側の縦枠を描写
+            attrset(COLOR_PAIR(NOMAL));
+            mvaddstr(i, k, "| ");
+           
+            // 高さを一つ下げる
+            i++;
+       }
+        
+       // 余分な空白を描写
+       for (;i < h-2; i++) {
+           attrset(COLOR_PAIR(NOMAL));
+           int tw=0;
+           mvaddstr(i, tw++, " |");
+           tw++;
+           for (;tw<fileNameWidth;mvaddstr(i, tw++, " "));
+           mvaddstr(i, tw, "| ");            
+       }
+       
+       tw=0;
+       attrset(COLOR_PAIR(NOMAL));
+       mvaddstr(i, tw++, " "); 
+       tw++;
+       for (;tw<fileNameWidth;mvaddstr(i, tw++, "-"));
+       
+       refresh();
+       if (input(&scrollBase, lsData, commandRow)) break;
     }
-    resetty();
+    curs_set(1);
     return;
 }
 
@@ -386,11 +435,6 @@ void commandMode() {
             break;
         }
 
-        if ('f' == ch) {
-            commandLineLs();
-            break;
-        }
-
         if ('o' == ch) {
             renderingFinder();
             break;
@@ -415,18 +459,13 @@ void commandMode() {
     		gotoLine = stoi(inputBox());
     		
     		int i = 0;
-    		int gMinN = gotoLine - nowLineNum;    		    		
-    		
-    		/*
-    		
-    		*///
-    		
+    		int gMinN = gotoLine - nowLineNum; 		
     		
 	        if (gMinN > 0) {
 				gIndex = 0;
         		for (int lineCounter=1;gIndex<gBuf.size();gIndex++) {
         			if (gBuf[gIndex] == '\n') {	
-						display();
+						//display();
 						if (lineCounter<gotoLine)
 							lineCounter++;	
 						else 
@@ -435,10 +474,12 @@ void commandMode() {
 	        	}
         	} else {
         		for (int lineCounter=1;gIndex>-(nowLineNum-gMinN);gIndex--) {
+            		/*
             		if (gBuf[gIndex] == '\n')
-        				display();
+        				display();	
+				*///
 	        	}
-				//display();	        	
+	        	
 	        }
 	        
         	break;
@@ -547,6 +588,16 @@ void insertMode() {
                 (gBuf[gIndex] == '\'' && gBuf[gIndex + 1] == '\'')) {
                 gBuf.erase(gBuf.begin() + (gIndex + 1));
             }
+            
+            else if ((gBuf[gIndex-1] == '(' && gBuf[gIndex] == ')') ||
+                (gBuf[gIndex-1] == '{' && gBuf[gIndex] == '}') ||
+                (gBuf[gIndex-1] == '[' && gBuf[gIndex] == ']') ||
+                (gBuf[gIndex-1] == '"' && gBuf[gIndex] == '"') ||
+                (gBuf[gIndex-1] == '\'' && gBuf[gIndex] == '\'')) {
+                    gIndex+=2;                
+                    continue;
+            }
+
 
             gBuf.erase(gBuf.begin() + (gIndex));
             if (nowInputWord.size() > 0)
@@ -632,6 +683,10 @@ void insertMode() {
     commandLineWord = " NOMAL ";
 }
 
+//   world
+//   world 
+//   Hello,
+
 void paste() {
     (moveDiff < 0) ? reverse(yankBuf.begin(), yankBuf.end()) : void();
     for (auto ch : yankBuf)
@@ -657,6 +712,135 @@ void windowChange() {
     (windows > nowWindow && windows > 1) ? nowWindow++ : nowWindow = 0;
 }
 
+int drawLine(int y, int rimit) {
+	mvaddstr(y, 0, " ");
+	for (int i=1;i<rimit-1;i++) {
+		mvaddstr(y, i, "-");
+	}
+	mvaddstr(y, rimit, " ");
+	return y++;
+}
+
+void printlnInTerminal(string word, int *x, int *y) {
+	mvaddstr(*y, *x, word.c_str());
+	
+	for (*x += word.length();*x<w-1;(*x)++) {
+		mvaddstr(*y, *x, " ");
+	}
+	
+	mvaddstr(*y, *x, "\n");
+}
+
+bool ExecCmd(string cmd, string& stdOut, int& exitCode) {
+	std::shared_ptr<FILE> pipe(popen(cmd.c_str(), "r"), [&](FILE* p) {exitCode = pclose(p); });
+	if (!pipe) {
+		return false;
+	}
+	std::array<char, 256> buf;
+	while (!feof(pipe.get())) {
+		if (fgets(buf.data(), buf.size(), pipe.get()) != nullptr) {
+			stdOut += buf.data();
+		}
+	}
+	return true;
+}
+
+string runCommand(string command, int* index) {
+	string ret = "";
+	string stdOut = "";
+	int exitCode = 0;
+				
+		
+	if (ExecCmd(command, stdOut, exitCode)) {
+		if (stdOut == "")
+			stdOut = "code: 0\n";
+		for (int i=0;i<stdOut.size();i++) {
+			if (stdOut.at(i) == '\n')
+				(*index)++;
+			else
+				ret += stdOut.at(i);
+		}
+		return ret;
+	}
+	exit(1);
+}
+                                                                            
+void terminal(string startCommand) {
+
+    if (!terminalSwitch) {
+		return;
+	}
+
+	int terminalHeight = 20;
+	int terminalWidth = w;
+	int terminalInputIndex = 0;
+	vector<string> terminalPutBuf (terminalHeight, "");	
+
+	terminalPutBuf.at(0) = runCommand(startCommand, &terminalInputIndex);
+	
+	for (;;) {	
+		int startHeight = h - terminalHeight;	
+		
+		display();
+		
+		startHeight = drawLine(startHeight, terminalWidth);	
+		startHeight++;	
+		
+		for (int terminalPutBufIndex=0;startHeight < h-2;) {	
+			int x = 0;
+			mvaddstr(startHeight, x++, "|");
+			printlnInTerminal(terminalPutBuf.at(terminalPutBufIndex++), &x, &startHeight);
+			mvaddstr(startHeight++, x, "|");
+		}	
+		
+		startHeight = drawLine(startHeight, terminalWidth);
+	
+		refresh();	
+		
+		int ch = getch();
+		switch (ch) {
+			case kESC: {
+				terminalSwitch = false;
+				return;
+			}
+			case 127: {
+				terminalPutBuf.at(terminalInputIndex).pop_back();
+				
+				break;
+			}
+			case '\n': {
+				// 適当なコマンドを用意する
+				string resultStr = runCommand(terminalPutBuf.at(terminalInputIndex), &terminalInputIndex);
+				
+				terminalPutBuf.at(terminalInputIndex++) = resultStr;
+				
+				break;
+			}
+			default: {
+				terminalPutBuf.at(terminalInputIndex).push_back(ch);
+				break;
+			}
+		}
+	}
+}
+
+void finderOn() {
+	finderDrawBuf = 0;
+    if (finderSwitch == true) {
+        finderSwitch = false;
+    }
+    else {
+        finderSwitch = true;
+    }
+}
+
+void terminalOn() {
+	if (terminalSwitch)
+		terminalSwitch = false;
+	else
+		terminalSwitch = true;
+} 
+
 unordered_map<char, void (*)()> gAction = {
     {'h', left},
     {'l', right},
@@ -678,7 +862,7 @@ unordered_map<char, void (*)()> gAction = {
     {kCtrlS, save},
     {'o', newLine},
     //{kCtrlW, finderCursor},
-    {kCtrlF, commandLineLs},
+    {kCtrlF, finderOn},
     {'H', gotoUp},
     {'L', gotoDown},
     {'f', commandMode},
@@ -693,11 +877,12 @@ unordered_map<char, void (*)()> gAction = {
     {'p', paste},
     {'a', addInsert},
     {'u', undo},
-
+    {kCtrlJ, terminalOn},
 };
 
 void run() {
     ifstream ifs(gFileName, ios::binary);
+    gIndex = 0;
     gBuf.assign(istreambuf_iterator<char>(ifs), istreambuf_iterator<char>());
     gUndoBuf = gBuf;
     gUndoIndex = gIndex;
@@ -708,6 +893,7 @@ void run() {
     commandLineWord = " NOMAL ";
     finderData = {""};
     finderSwitch = false;
+    gPageStart = gPageEnd = 0;
 
     // split token
     if (!classical) {
@@ -742,6 +928,8 @@ void run() {
 
     // start
     while (!gDone) {
+        terminal("echo hello");
+        commandLineLs();
         display();
         char ch = getch();
         if (gAction.count(ch) > 0) gAction[ch]();

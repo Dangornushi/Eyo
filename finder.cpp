@@ -1,4 +1,5 @@
 #include "eyo.hpp"
+#include <algorithm>
 
 namespace fs = std::__fs::filesystem;
 const fs::directory_iterator end;
@@ -14,7 +15,7 @@ void drawLinenumAndFinder(string *lineNumberString, int *c, const int AllLineLen
     printw(" ");
 
     *lineNumberString = to_string(LineStart + (*c)++) + " ";
-    for (; AllLineLength > (*lineNumberString).size();
+    for (; AllLineLength+finderDrawBuf > (*lineNumberString).size();
         (*lineNumberString).insert(0, " "));
 
     (*lineNumberString).insert(0, " ");
@@ -59,26 +60,6 @@ void drawInDir(const bool finderSwitch, const string lineNumberString, const int
         //nowLineBuf=2;
         return;
     }
-    if (finderData.size() <= index) {
-        for (int k = 0; k < nowLineBuf-1; k++)
-            printw("_");
-    } else {
-        string fd;
-        if (index < finderData.size()) {
-            fd = finderData[index];
-            if (fd[0] == 'F') attrset(COLOR_PAIR(NOMAL));
-
-            if (fd[0] == 'D') attrset(COLOR_PAIR(TYPE));
-            printw(" ");
-        }
-        printw("%s", fd.c_str());
-
-        int k = fd.length() + lineNumberString.length();
-
-        if (k > nowLineBuf)
-            nowLineBuf = k+1;
-
-        for (; k < nowLineBuf+1; k++) printw(" "); }
     attrset(COLOR_PAIR(NOMAL));
 }
 

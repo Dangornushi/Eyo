@@ -1,4 +1,4 @@
-PRG    = ./build/eyo
+PRG = ./build/eyo
 OBJDIR = ./build/obj/
 OBJ    = main.o move.o display.o visualMode.o util.o finder.o colorscheme.o
 
@@ -23,4 +23,6 @@ clean:
 ./build/move.o: move.cpp eyo.hpp
 ./build/util.o: util.cpp eyo.hpp
 ./build/visualMode.o: visualMode.cpp eyo.hpp
+
+
 
