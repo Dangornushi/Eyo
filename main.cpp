@@ -7,7 +7,14 @@
 #include "util.hpp"
 #include "visualMode.hpp"
 
-namespace fs = std::__fs::filesystem;
+#ifdef __linux
+    #include <filesystem>
+    #include <algorithm>
+    namespace fs = std::filesystem;
+#else
+    namespace fs = std::__fs::filesystem;
+#endif
+
 const char *gFileName;
 const fs::directory_iterator end;
 
@@ -949,7 +956,7 @@ void init() {
     idlok(stdscr, true);  // init screen.
     getmaxyx(stdscr, h, w);
 
-    classical = false;
+    classical = true;
 
     run();
 }

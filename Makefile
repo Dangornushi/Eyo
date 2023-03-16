@@ -2,13 +2,13 @@ PRG = ./build/eyo
 OBJDIR = ./build/obj/
 OBJ    = main.o move.o display.o visualMode.o util.o finder.o colorscheme.o
 
-CFLAGS = -g -O2 -std=c++17
+CFLAGS = -g -O2 -std=c++20
 LFLAGS = -lcurses
-CC     =  g++ $(CFLAGS)
+CC     =  clang++ $(CFLAGS)
 
 $(PRG) : $(OBJ)
 	$(CC) -o $@ $^ $(LFLAGS)
-	cp build/eyo /usr/local/bin/.
+	cp build/eyo /usr/local/bin/
 
 .cpp.o:
 	$(CC) -c $<
