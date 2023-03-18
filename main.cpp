@@ -7,14 +7,6 @@
 #include "util.hpp"
 #include "visualMode.hpp"
 
-#ifdef __linux
-    #include <filesystem>
-    #include <algorithm>
-    namespace fs = std::filesystem;
-#else
-    namespace fs = std::__fs::filesystem;
-#endif
-
 const char *gFileName;
 const fs::directory_iterator end;
 
