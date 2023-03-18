@@ -25,7 +25,7 @@ void display() {
     move(0, 0);
 
     int x = 0;
-    int y = 1;
+    int y = 0;
     int tokenCounter = 0;
     int nowToken = 0;
     int tmpLineBuf = nowLineBuf;
@@ -38,23 +38,21 @@ void display() {
 	// ツールバー
 	string filename = gFileName;
     string cursorRow = " " + filename + " ";
-    int consoleRow = 0; // ツールバーがある高さ
+    int consoleRow = y++; // ツールバーがある高さ
 
-    attrset(COLOR_PAIR(nowMode));
+    color(nowMode);
     mvaddstr(consoleRow, 0, commandLineWord.c_str());
-    attrset(COLOR_PAIR(COMMANDLINE));
+    color(COMMANDLINE);
 
     for (auto j=commandLineWord.size(); j < COLS - cursorRow.size();)
         mvaddstr(consoleRow, j++, " ");
 
-    attrset(COLOR_PAIR(NOMAL));
+    color(NOMAL);
     mvaddstr(consoleRow, COLS - cursorRow.size(), cursorRow.c_str());
     // 
     
     gPageEnd = gPageStart;
-
     drawLinenumAndFinder(&lineNumberString, &c, AllLineLength);
-
     nowLineBuf = lineNumberString.size() + 1;
 
     for (auto p = gBuf.begin() + gPageEnd;; gPageEnd++, p++) {
@@ -72,8 +70,9 @@ void display() {
         if (nowMode == VISUAL_M &&
             ((gPageEnd >= visualStart && gPageEnd < visualEnd) ||
              (gPageEnd < visualStart && gPageEnd >= visualEnd))) {
+            // visualModeにおいての処理
 
-            attrset(COLOR_PAIR(NOMAL_MODE));
+            color(NOMAL_MODE);
 
             (*p == '\t') ? printw("    ") : addch(*p);
             x += *p == '\t' ? 4 - (x & 3) : 1;
@@ -100,9 +99,8 @@ void display() {
             drawLinenumAndFinder(&lineNumberString, &c, AllLineLength);
             x = 0;
             nowComment = false;
-            attrset(COLOR_PAIR(NOMAL));
+            color(NOMAL);
         }
-        //if (*p != '\r') {
         else {
             // if the colour options was set
             switch (*p) {
@@ -115,17 +113,17 @@ void display() {
                 case '&':
                 case '$':
                 case '%':
-                    attrset(COLOR_PAIR(OP));
+                    color(OP);
                     break;
 
                 case '(':
                 case ')':
-                    attrset(COLOR_PAIR(PARENTHESES));
+                    color(PARENTHESES);
                     break;
 
                 case '{':
                 case '}':
-                    attrset(COLOR_PAIR(BRACKETS));
+                    color(BRACKETS);
                     break;
 
                 default: {
@@ -134,7 +132,7 @@ void display() {
                             nowConsecutiveComment = false;
                             nowComment = false;
                         }
-                        attrset(COLOR_PAIR(COMMENT));
+                        color(COMMENT);
                         break;
                     }
 
@@ -155,10 +153,10 @@ void display() {
                                 tokenPaint(&nowToken, &tokenCounter, v.word.size(), v.type);
                                 break;
                             }
-                            attrset(COLOR_PAIR(NOMAL));
+                            color(NOMAL);
                         }
                     }
-                    else attrset(COLOR_PAIR(NUM));
+                    else color(NUM);
                     break;
                 }
             }

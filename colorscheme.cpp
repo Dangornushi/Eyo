@@ -64,13 +64,19 @@ void backChange() {
 	jsonToScheme();
 	
     return;
- }
+}
 
 void tokenPaint(int *nowToken, int *tokenCounter, const int len,
                 const int attribute) {
     if (*tokenCounter == 0) *tokenCounter = len;
     (*tokenCounter)--;
     *nowToken = attribute;
-    attrset(COLOR_PAIR(attribute));
+    color(attribute);
 }
 
+void color(int colorNum) {
+	if (has_colors())
+		attrset(COLOR_PAIR(colorNum));
+	else
+		;
+}

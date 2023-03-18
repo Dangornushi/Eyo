@@ -18,7 +18,7 @@ void drawFinder();
 vector<string> fileAndDirS;
 
 void drawLinenumAndFinder(string *lineNumberString, int *c, const int AllLineLength) {
-    attrset(COLOR_PAIR(COMMANDLINE));
+    color(COMMANDLINE);
     printw(" ");
 
     *lineNumberString = to_string(LineStart + (*c)++) + " ";
@@ -26,15 +26,15 @@ void drawLinenumAndFinder(string *lineNumberString, int *c, const int AllLineLen
         (*lineNumberString).insert(0, " "));
 
     (*lineNumberString).insert(0, " ");
-    attrset(COLOR_PAIR(LINE));
+    color(LINE);
     printw("%s", (*lineNumberString).c_str());
 }
 
 void drawTildeAndFinder(string *lineNumberString, const int AllLineLength) {
-    attrset(COLOR_PAIR(COMMANDLINE));
+    color(COMMANDLINE);
     printw(" ");
 
-    attrset(COLOR_PAIR(LINE));
+    color(LINE);
     printw("%s", (*lineNumberString).c_str());
 }
 
@@ -67,7 +67,7 @@ void drawInDir(const bool finderSwitch, const string lineNumberString, const int
         //nowLineBuf=2;
         return;
     }
-    attrset(COLOR_PAIR(NOMAL));
+    color(NOMAL);
 }
 
 void drawFinder() {

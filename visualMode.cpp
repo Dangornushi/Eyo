@@ -50,7 +50,7 @@ void visualMode() {
                 move (gRow+1, gCol);
                 for (;tmp_gIndex < gIndex; ++moveDiff, i++) {
                     visualData.push_back(gBuf[--gIndex]);
-                    attrset(COLOR_PAIR(NOMAL));
+                    color(NOMAL);
                     printw("%c", gBuf[gIndex]);
                 }
 
