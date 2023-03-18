@@ -75,6 +75,7 @@ typedef struct {
 extern void init();
 extern void run();
 
+extern void color(int colorNum);
 extern bool split_token(string::iterator data, const char *word, int index);
 
 extern void tokenPaint(int *nowToken, int *tokenCounter, const int len, const int attribute);
@@ -113,4 +114,5 @@ extern int windows;
 extern int visualStart;
 extern int visualEnd;
 extern int finderDrawBuf;
+extern map<int, int> colorMap;
 
