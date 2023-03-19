@@ -49,7 +49,7 @@ void display() {
 
     color(NOMAL);
     mvaddstr(consoleRow, COLS - cursorRow.size(), cursorRow.c_str());
-    // 
+    // ==========
     
     gPageEnd = gPageStart;
     drawLinenumAndFinder(&lineNumberString, &c, AllLineLength);

@@ -1,6 +1,8 @@
 // main.cpp   mushi's editor 2022.
 // Github; Dangornushi-eyo
 
+// Hello!
+
 #include "eyo.hpp"
 #include "finder.hpp"
 #include "move.hpp"
@@ -170,12 +172,28 @@ vector<Token> predictiveWin(const string word, const vector<Token> vec,
 }
 
 // no move
-void save() {
+void save_old() {
     ofstream ofs(gFileName, ios::binary);
     ostream_iterator<char> output_iterator(ofs);
     copy(gBuf.begin(), gBuf.end(), output_iterator);
     commandLineWord = "saved";
-    redraw();
+}
+
+void save() {
+    // File buf
+    FILE *fpw = fopen( gFileName , "wb" );
+    // buf buf
+    vector<char> buffer( gBuf.size()* sizeof(char*) );
+    // buf iteretor
+    auto gBufIt = gBuf.begin();
+
+    // ファイルコピー
+    while( *gBufIt != NULL ) {
+        buffer[0] = *gBufIt;
+        fwrite( &buffer[0], sizeof(buffer[0]), 1, fpw );
+        gBufIt++;
+    }
+    fclose( fpw );
 }
 
 void renderingNowLine() {
@@ -366,7 +384,7 @@ void commandLineLs() {
 string inputBox() {
     string runCommandBuf;
 
-    for (int ch;; display(), savetty()) {
+    for (int ch;; display()) {
         if ((ch = getch()) == kESC)
             break;
         else if (runCommandBuf.length() > 0 && (ch == kBS || ch == kDEL)) {
@@ -388,11 +406,26 @@ void commandMode() {
     nowMode = COMMAND_MODE;
     string before_commandLineWord = commandLineWord;
     commandLineWord = "> ";
-    redraw();
+//    redraw();
 
-    for (int ch = getch();;) {
+	// ツールバー
+	string filename = gFileName;
+    string cursorRow = " " + filename + " ";
+    int consoleRow = 0; // ツールバーがある高さ
+
+    for (;;) {
+        color(nowMode);
+        mvaddstr(consoleRow, 0, commandLineWord.c_str());
+        color(COMMANDLINE);
+
+        for (auto j=commandLineWord.size(); j < COLS - cursorRow.size();)
+            mvaddstr(consoleRow, j++, " ");
+
+        color(NOMAL);
+        mvaddstr(consoleRow, COLS - cursorRow.size(), cursorRow.c_str());
+       
+		int ch = getch();
         commandLineWord = ch;
-        redraw();
 
         if (kESC == ch) break;
 
@@ -442,7 +475,6 @@ void commandMode() {
                 for (int lineCounter = 1; gIndex > -(nowLineNum - gMinN);
                      gIndex--) {
                     display();
-
                 }
             }
 
@@ -863,13 +895,14 @@ void run() {
     }
 
     // start
+    
+    terminal("echo hello");
+    
     while (!gDone) {
-        terminal("echo hello");
         commandLineLs();
         display();
         char ch = getch();
         if (gAction.count(ch) > 0) gAction[ch]();
-
         if (nowWindow == 1) finder();
     }
     endwin();
