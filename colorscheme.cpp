@@ -1,8 +1,10 @@
 #include "eyo.hpp"
+#include "util.hpp"
 #include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
 
+map<int, RGB> colorMap;
 short R;
 short G;
 short B;
@@ -18,12 +20,11 @@ int color_gen(int r, int g, int b, int color) {
 }
 
 int color_gen_fromVec(vector<int> rgb, int color) {
-    init_color(color, (rgb[0]-buf_2) * RGB_buf, (rgb[1]-buf_2) * RGB_buf, (rgb[2]-buf_2) * RGB_buf);
+    init_color(color, (rgb[0]-buf_2) * RGB_buf, (rgb[1]-buf_2) * RGB_buf, (rgb[2]-buf_2) * RGB_buf); 
     return color;
 }
 
 void jsonToScheme() {
-	//std::ifstream i("~/.config/eyo/Nord.json");
 //	std::ifstream i("Theme.json");
 	std::ifstream i("Nord.json");	
 	
@@ -60,9 +61,9 @@ void backChange() {
     init_pair(BRACKETS, 0xE2, BACK);
     init_pair(SUBWIN, 0x69, 0x5A);
     init_pair(VARIABLE, 0x74, BACK);
-
-	jsonToScheme();
 	
+	jsonToScheme();
+
     return;
 }
 
@@ -71,12 +72,9 @@ void tokenPaint(int *nowToken, int *tokenCounter, const int len,
     if (*tokenCounter == 0) *tokenCounter = len;
     (*tokenCounter)--;
     *nowToken = attribute;
-    color(attribute);
+    attrset(COLOR_PAIR(attribute));
 }
 
 void color(int colorNum) {
-	if (has_colors())
-		attrset(COLOR_PAIR(colorNum));
-	else
-		;
+	attrset(COLOR_PAIR(colorNum));
 }

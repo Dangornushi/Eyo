@@ -14,6 +14,7 @@
 #ifdef __linux
     #include <filesystem>
     #include <algorithm>
+    #include <ncurses.h>
     namespace fs = std::filesystem;
 #else
     namespace fs = std::__fs::filesystem;
@@ -80,6 +81,12 @@ typedef struct {
     int type;
 } Token;
 
+typedef struct {
+    int R;
+    int G;
+    int B;
+} RGB;
+
 extern void init();
 extern void run();
 
@@ -122,5 +129,5 @@ extern int windows;
 extern int visualStart;
 extern int visualEnd;
 extern int finderDrawBuf;
-extern map<int, int> colorMap;
+extern map<int, RGB> colorMap;
 

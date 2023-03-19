@@ -146,6 +146,7 @@ void display() {
 
                             if (split_token(gBuf, gPageEnd, v.word.c_str(), v.word.size()) ||
                                 (nowToken == v.type && tokenCounter > 0)) {
+                                
                                 if (v.type == COMMENT)
                                     nowComment = true;
                                 if (v.type == CONSECUTIVECOMMENT)

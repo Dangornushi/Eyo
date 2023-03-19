@@ -1,5 +1,13 @@
 #include "eyo.hpp"
 
+bool nowLinux() {
+    #ifdef __linux
+        return true;
+    #else
+        return false;
+    #endif
+}
+
 // util
 bool find(const string s, const vector<Token> v) {
     for (auto autoV : v)

@@ -1,4 +1,4 @@
-/// main.cpp   mushi's editor 2022.
+// main.cpp   mushi's editor 2022.
 // Github; Dangornushi-eyo
 
 #include "eyo.hpp"
@@ -441,10 +441,8 @@ void commandMode() {
             } else {
                 for (int lineCounter = 1; gIndex > -(nowLineNum - gMinN);
                      gIndex--) {
-                    /*
-                    if (gBuf[gIndex] == '\n')
-                                    display();
-                            *///
+                    display();
+
                 }
             }
 
@@ -460,6 +458,7 @@ void commandMode() {
 
     // commandLineWord = before_commandLineWord;
     nowMode = NOMAL_MODE;
+    display();
     redraw();
 }
 
@@ -529,7 +528,7 @@ void insertMode() {
 
     for (int ch;;) {
         int tmpLineBuf = nowLineBuf;
-        redraw();
+        display();
         nowLineBuf = tmpLineBuf;
         savetty();
         if (!classical) {
@@ -745,7 +744,6 @@ void terminal(string startCommand) {
         int startHeight = h - terminalHeight;
 
         display();
-
         startHeight = drawLine(startHeight, terminalWidth);
         startHeight++;
 
@@ -840,7 +838,7 @@ void run() {
         // 色設
         start_color();
 
-        if (can_change_color() == true && has_colors() == true) backChange();
+        backChange();
 
         assume_default_colors(0x00, 0x00);
 
@@ -887,7 +885,7 @@ void init() {
     idlok(stdscr, true);  // init screen.
     getmaxyx(stdscr, h, w);
 
-    classical = true;
+    classical = false;
 
     run();
 }

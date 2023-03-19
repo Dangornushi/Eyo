@@ -6,4 +6,5 @@ extern bool split_token(vector<char> v, int i, const char *word, int index);
 extern bool isChar(char data);
 extern void index(const string word, const vector<char> vec);
 extern bool isFunction(vector<char> v, int i);
+extern bool nowLinux();
 
