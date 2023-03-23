@@ -20,6 +20,8 @@
     namespace fs = std::__fs::filesystem;
 #endif
 
+
+#define DEVELOP_TIME_TEST 0
 #define NOMAL_M 0
 #define INSERT_M 1
 #define COMMAND_M 2
@@ -130,4 +132,5 @@ extern int visualStart;
 extern int visualEnd;
 extern int finderDrawBuf;
 extern map<int, RGB> colorMap;
+extern long startupSec;
 

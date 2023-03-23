@@ -35,21 +35,25 @@ void display() {
     bool nowConsecutiveComment = false;
     
     
-	// ツールバー
+	// ツールバー 
 	string filename = gFileName;
     string cursorRow = " " + filename + " ";
+    string startupSecString = " start up in: 0.0" + to_string(startupSec) + "";
     int consoleRow = y++; // ツールバーがある高さ
-
     color(nowMode);
     mvaddstr(consoleRow, 0, commandLineWord.c_str());
     color(COMMANDLINE);
 
-    for (auto j=commandLineWord.size(); j < COLS - cursorRow.size();)
+    if (DEVELOP_TIME_TEST == 0) {
+        mvaddstr(consoleRow, commandLineWord.length(), startupSecString.c_str());
+    }
+
+    for (auto j=commandLineWord.length()+startupSecString.length(); j < COLS - cursorRow.size();)
         mvaddstr(consoleRow, j++, " ");
 
     color(NOMAL);
     mvaddstr(consoleRow, COLS - cursorRow.size(), cursorRow.c_str());
-    // ==========
+    // ========== 
     
     gPageEnd = gPageStart;
     drawLinenumAndFinder(&lineNumberString, &c, AllLineLength);

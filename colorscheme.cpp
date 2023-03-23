@@ -1,6 +1,6 @@
 #include "eyo.hpp"
 #include "util.hpp"
-#include <nlohmann/json.hpp>
+#include <nlohmann/json.hpp> //
 
 using json = nlohmann::json;
 
@@ -25,7 +25,6 @@ int color_gen_fromVec(vector<int> rgb, int color) {
 }
 
 void jsonToScheme() {
-//	std::ifstream i("Theme.json");
 	std::ifstream i("Nord.json");	
 	
 	json j;
@@ -37,14 +36,14 @@ void jsonToScheme() {
 	map<string, vector<int>> back = j["back"];
 
 	// ColorScheme
-	for (auto itr = colors.begin(); itr != colors.end(); ++itr) {	
+	for (auto itr = colors.begin(); itr != colors.end(); ++itr) {
 		init_pair(StrToNum[itr->first], color_gen_fromVec(itr->second, StrToNum[itr->first]), BACK);	
 	}
 
 	// AirLine
 	for (auto itr = statusBar.begin(); itr != statusBar.end(); ++itr) {	
 		init_pair(StrToNum[itr->first], BACK, color_gen_fromVec(itr->second, StrToNum[itr->first]));
-	}		
+	}
 	
 	// Back
 	for (auto itr = back.begin(); itr != back.end(); ++itr) {	
@@ -78,3 +77,4 @@ void tokenPaint(int *nowToken, int *tokenCounter, const int len,
 void color(int colorNum) {
 	attrset(COLOR_PAIR(colorNum));
 }
+

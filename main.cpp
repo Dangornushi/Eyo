@@ -18,6 +18,9 @@ vector<Token> predictive = initPredictiveTransform();
 string commandLineWord;
 string yankBuf;
 
+clock_t startClock;
+long startupSec;
+
 bool gDone = false;
 int gIndex;
 int gPageStart;
@@ -406,8 +409,7 @@ void commandMode() {
     nowMode = COMMAND_MODE;
     string before_commandLineWord = commandLineWord;
     commandLineWord = "> ";
-//    redraw();
-
+    
 	// ツールバー
 	string filename = gFileName;
     string cursorRow = " " + filename + " ";
@@ -898,6 +900,11 @@ void run() {
     
     terminal("echo hello");
     
+    if (DEVELOP_TIME_TEST == 0) {
+        clock_t end = clock();
+        startupSec = (end-startClock);
+    }
+
     while (!gDone) {
         commandLineLs();
         display();
@@ -924,6 +931,7 @@ void init() {
 }
 
 int main(int argc, char **argv) {
+    startClock = clock();
     if (argc < 2) return 2;
 
     // file
