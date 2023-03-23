@@ -1,7 +1,12 @@
 #include "eyo.hpp"
 #include "util.hpp"
-#include <nlohmann/json.hpp> //
 
+
+#ifdef __linux
+    #include <nlohmann/json.hpp> //
+#else
+    #include "nlohmann/json.hpp" //
+#endif
 using json = nlohmann::json;
 
 map<int, RGB> colorMap;
