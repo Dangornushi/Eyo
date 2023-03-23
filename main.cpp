@@ -1,8 +1,6 @@
 // main.cpp   mushi's editor 2022.
 // Github; Dangornushi-eyo
 
-// Hello!
-
 #include "eyo.hpp"
 #include "finder.hpp"
 #include "move.hpp"
