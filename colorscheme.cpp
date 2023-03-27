@@ -83,3 +83,4 @@ void color(int colorNum) {
 	attrset(COLOR_PAIR(colorNum));
 }
 
+

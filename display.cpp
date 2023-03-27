@@ -5,6 +5,16 @@
 
 void display() {
 
+    int x = 0;
+    int y = 0;
+    int tokenCounter = 0;
+    int nowToken = 0;
+    int tmpLineBuf = nowLineBuf;
+    int AllLineLength = to_string(gLines).size()+1;
+    string lineNumberString;
+    bool nowComment = false;
+    bool nowConsecutiveComment = false;
+    
     int c = 1;
 
     if (gIndex < gPageStart) {
@@ -23,17 +33,6 @@ void display() {
     }
 
     move(0, 0);
-
-    int x = 0;
-    int y = 0;
-    int tokenCounter = 0;
-    int nowToken = 0;
-    int tmpLineBuf = nowLineBuf;
-    int AllLineLength = to_string(gLines).size()+1;
-    string lineNumberString;
-    bool nowComment = false;
-    bool nowConsecutiveComment = false;
-    
     
 	// ツールバー 
 	string filename = gFileName;
@@ -97,7 +96,7 @@ void display() {
             LineStart--;
         }
  
-        if (*p == '\n' || COLS <= x) {
+        if ((*p == '\n' || COLS <= x) && y <= h) {
             printw("\n");
             drawInDir(finderSwitch, lineNumberString, ++y);
             drawLinenumAndFinder(&lineNumberString, &c, AllLineLength);
@@ -187,4 +186,32 @@ void display() {
     move(gRow, gCol+nowLineBuf);
     refresh(); 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

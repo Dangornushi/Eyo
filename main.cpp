@@ -1,6 +1,7 @@
 // main.cpp   mushi's editor 2022.
 // Github; Dangornushi-eyo
 
+
 #include "eyo.hpp"
 #include "finder.hpp"
 #include "move.hpp"
@@ -903,7 +904,7 @@ void run() {
         startupSec = (end-startClock);
     }
 
-    while (!gDone) {
+    while (!gDone) { 
         commandLineLs();
         display();
         char ch = getch();
@@ -938,4 +939,32 @@ int main(int argc, char **argv) {
 
     return 0;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
