@@ -11,17 +11,6 @@
 #include <string>
 #include <array>
 
-#ifdef __linux
-    #include <filesystem>
-    #include <algorithm>
-    #include <ncurses.h>
-    namespace fs = std::filesystem;
-#else
-    namespace fs = std::__fs::filesystem;
-#endif
-
-
-#define DEVELOP_TIME_TEST 0
 #define NOMAL_M 0
 #define INSERT_M 1
 #define COMMAND_M 2
@@ -83,16 +72,9 @@ typedef struct {
     int type;
 } Token;
 
-typedef struct {
-    int R;
-    int G;
-    int B;
-} RGB;
-
 extern void init();
 extern void run();
 
-extern void color(int colorNum);
 extern bool split_token(string::iterator data, const char *word, int index);
 
 extern void tokenPaint(int *nowToken, int *tokenCounter, const int len, const int attribute);
@@ -131,6 +113,4 @@ extern int windows;
 extern int visualStart;
 extern int visualEnd;
 extern int finderDrawBuf;
-extern map<int, RGB> colorMap;
-extern long startupSec;
 

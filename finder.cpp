@@ -1,14 +1,7 @@
 #include "eyo.hpp"
 #include <algorithm>
 
- 
-#ifdef __linux
-    #include<filesystem>
-    namespace fs = std::filesystem;
-#else
-    namespace fs = std::__fs::filesystem;
-#endif
-
+namespace fs = std::__fs::filesystem;
 const fs::directory_iterator end;
 int fCol;
 int fRow;
@@ -18,7 +11,7 @@ void drawFinder();
 vector<string> fileAndDirS;
 
 void drawLinenumAndFinder(string *lineNumberString, int *c, const int AllLineLength) {
-    color(COMMANDLINE);
+    attrset(COLOR_PAIR(COMMANDLINE));
     printw(" ");
 
     *lineNumberString = to_string(LineStart + (*c)++) + " ";
@@ -26,15 +19,15 @@ void drawLinenumAndFinder(string *lineNumberString, int *c, const int AllLineLen
         (*lineNumberString).insert(0, " "));
 
     (*lineNumberString).insert(0, " ");
-    color(LINE);
+    attrset(COLOR_PAIR(LINE));
     printw("%s", (*lineNumberString).c_str());
 }
 
 void drawTildeAndFinder(string *lineNumberString, const int AllLineLength) {
-    color(COMMANDLINE);
+    attrset(COLOR_PAIR(COMMANDLINE));
     printw(" ");
 
-    color(LINE);
+    attrset(COLOR_PAIR(LINE));
     printw("%s", (*lineNumberString).c_str());
 }
 
@@ -67,7 +60,7 @@ void drawInDir(const bool finderSwitch, const string lineNumberString, const int
         //nowLineBuf=2;
         return;
     }
-    color(NOMAL);
+    attrset(COLOR_PAIR(NOMAL));
 }
 
 void drawFinder() {

@@ -5,16 +5,6 @@
 
 void display() {
 
-    int x = 0;
-    int y = 0;
-    int tokenCounter = 0;
-    int nowToken = 0;
-    int tmpLineBuf = nowLineBuf;
-    int AllLineLength = to_string(gLines).size()+1;
-    string lineNumberString;
-    bool nowComment = false;
-    bool nowConsecutiveComment = false;
-    
     int c = 1;
 
     if (gIndex < gPageStart) {
@@ -33,29 +23,38 @@ void display() {
     }
 
     move(0, 0);
+
+    int x = 0;
+    int y = 1;
+    int tokenCounter = 0;
+    int nowToken = 0;
+    int tmpLineBuf = nowLineBuf;
+    int AllLineLength = to_string(gLines).size()+1;
+    string lineNumberString;
+    bool nowComment = false;
+    bool nowConsecutiveComment = false;
     
-	// ツールバー 
+    
+	// ツールバー
 	string filename = gFileName;
     string cursorRow = " " + filename + " ";
-    string startupSecString = " start up in: 0.0" + to_string(startupSec) + "";
-    int consoleRow = y++; // ツールバーがある高さ
-    color(nowMode);
+    int consoleRow = 0; // ツールバーがある高さ
+
+    attrset(COLOR_PAIR(nowMode));
     mvaddstr(consoleRow, 0, commandLineWord.c_str());
-    color(COMMANDLINE);
+    attrset(COLOR_PAIR(COMMANDLINE));
 
-    if (DEVELOP_TIME_TEST == 0) {
-        mvaddstr(consoleRow, commandLineWord.length(), startupSecString.c_str());
-    }
-
-    for (auto j=commandLineWord.length()+startupSecString.length(); j < COLS - cursorRow.size();)
+    for (auto j=commandLineWord.size(); j < COLS - cursorRow.size();)
         mvaddstr(consoleRow, j++, " ");
 
-    color(NOMAL);
+    attrset(COLOR_PAIR(NOMAL));
     mvaddstr(consoleRow, COLS - cursorRow.size(), cursorRow.c_str());
-    // ========== 
+    // 
     
     gPageEnd = gPageStart;
+
     drawLinenumAndFinder(&lineNumberString, &c, AllLineLength);
+
     nowLineBuf = lineNumberString.size() + 1;
 
     for (auto p = gBuf.begin() + gPageEnd;; gPageEnd++, p++) {
@@ -73,9 +72,8 @@ void display() {
         if (nowMode == VISUAL_M &&
             ((gPageEnd >= visualStart && gPageEnd < visualEnd) ||
              (gPageEnd < visualStart && gPageEnd >= visualEnd))) {
-            // visualModeにおいての処理
 
-            color(NOMAL_MODE);
+            attrset(COLOR_PAIR(NOMAL_MODE));
 
             (*p == '\t') ? printw("    ") : addch(*p);
             x += *p == '\t' ? 4 - (x & 3) : 1;
@@ -96,14 +94,15 @@ void display() {
             LineStart--;
         }
  
-        if ((*p == '\n' || COLS <= x) && y <= h) {
+        if (*p == '\n' || COLS <= x) {
             printw("\n");
             drawInDir(finderSwitch, lineNumberString, ++y);
             drawLinenumAndFinder(&lineNumberString, &c, AllLineLength);
             x = 0;
             nowComment = false;
-            color(NOMAL);
+            attrset(COLOR_PAIR(NOMAL));
         }
+        //if (*p != '\r') {
         else {
             // if the colour options was set
             switch (*p) {
@@ -116,17 +115,17 @@ void display() {
                 case '&':
                 case '$':
                 case '%':
-                    color(OP);
+                    attrset(COLOR_PAIR(OP));
                     break;
 
                 case '(':
                 case ')':
-                    color(PARENTHESES);
+                    attrset(COLOR_PAIR(PARENTHESES));
                     break;
 
                 case '{':
                 case '}':
-                    color(BRACKETS);
+                    attrset(COLOR_PAIR(BRACKETS));
                     break;
 
                 default: {
@@ -135,21 +134,20 @@ void display() {
                             nowConsecutiveComment = false;
                             nowComment = false;
                         }
-                        color(COMMENT);
+                        attrset(COLOR_PAIR(COMMENT));
                         break;
                     }
 
                     if (!isdigit(*p)) {
                         vector<Token> vec = initPredictiveTransform();
-                        for (auto v : vec) { 
-                            if (isFunction(gBuf, gPageEnd)) {
+                        for (auto v : vec) {
+                            if (isFunction(p)) {
                                 tokenPaint(&nowToken, &tokenCounter, 1, FUNCTION);
                                 break;
                             }
 
-                            if (split_token(gBuf, gPageEnd, v.word.c_str(), v.word.size()) ||
+                            if (split_token(p, v.word.c_str(), v.word.size()) ||
                                 (nowToken == v.type && tokenCounter > 0)) {
-                                
                                 if (v.type == COMMENT)
                                     nowComment = true;
                                 if (v.type == CONSECUTIVECOMMENT)
@@ -157,10 +155,10 @@ void display() {
                                 tokenPaint(&nowToken, &tokenCounter, v.word.size(), v.type);
                                 break;
                             }
-                            color(NOMAL);
+                            attrset(COLOR_PAIR(NOMAL));
                         }
                     }
-                    else color(NUM);
+                    else attrset(COLOR_PAIR(NUM));
                     break;
                 }
             }
@@ -186,32 +184,4 @@ void display() {
     move(gRow, gCol+nowLineBuf);
     refresh(); 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
