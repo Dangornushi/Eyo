@@ -141,12 +141,12 @@ void display() {
                     if (!isdigit(*p)) {
                         vector<Token> vec = initPredictiveTransform();
                         for (auto v : vec) {
-                            if (isFunction(p)) {
+                            if (isFunction(gBuf, gPageStart)) {
                                 tokenPaint(&nowToken, &tokenCounter, 1, FUNCTION);
                                 break;
                             }
 
-                            if (split_token(p, v.word.c_str(), v.word.size()) ||
+                            if (split_token(gBuf, gPageEnd, v.word.c_str(), v.word.size()) ||
                                 (nowToken == v.type && tokenCounter > 0)) {
                                 if (v.type == COMMENT)
                                     nowComment = true;

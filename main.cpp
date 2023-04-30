@@ -7,9 +7,8 @@
 #include "util.hpp"
 #include "visualMode.hpp"
 
-namespace fs = std::__fs::filesystem;
-const char *gFileName;
 const fs::directory_iterator end;
+const char *gFileName;
 
 vector<char> gBuf, gUndoBuf;
 vector<string> finderData;
@@ -65,6 +64,7 @@ void globalInit() {
     visualStart = 0;
     visualEnd = 0;
 }
+
 
 // TAG: Tokens
 vector<Token> initPredictiveTransform() {

@@ -9,9 +9,10 @@ bool find(const string s, const vector<Token> v) {
 }
 
 
-bool split_token(string::iterator data, const char *word, int index) {
-     for (int i = 0; i < index; i++)
-        if (data[i] != word[i])
+bool split_token(vector<char> v, int i, const char *word, int index) {
+    char data = v.at(i);
+    for (int i = 0; i < index; i++)
+        if (data != word[i])
             return false;
     return true;
 }
@@ -37,11 +38,13 @@ void index(const string word, const vector<char> vec) {
     (vec.size() > gIndex) ? gIndex : gIndex = v;
 }
 
-bool isFunction(string::iterator data) {
-    for (;data < gBuf.end();data++) {
-        if (*data == '(')
+bool isFunction(vector<char> v, int i) {
+    char data;
+    for (;i < gBuf.size(); i++) {
+	data = v.at(i);
+        if (data == '(')
             return true;
-        if (*data == ' ' || !isChar(*data))
+        if (data == ' ' || !isChar(data))
             return false;
     }
     return false;

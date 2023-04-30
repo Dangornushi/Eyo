@@ -11,6 +11,14 @@
 #include <string>
 #include <array>
 
+#ifdef __linux
+	#include <filesystem>
+	#include <algorithm>
+	namespace fs = std::filesystem;
+#else
+	namespace fs = std::__fs::filesystem;
+#endif
+
 #define NOMAL_M 0
 #define INSERT_M 1
 #define COMMAND_M 2

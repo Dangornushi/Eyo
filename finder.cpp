@@ -1,7 +1,13 @@
 #include "eyo.hpp"
 #include <algorithm>
 
-namespace fs = std::__fs::filesystem;
+#ifdef __linux
+	#include <filesystem>
+	namespace fs = std::filesystem;
+#else
+	namespace fs = std::_fs::filesystem;
+#endif
+
 const fs::directory_iterator end;
 int fCol;
 int fRow;
