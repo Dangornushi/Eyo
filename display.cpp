@@ -32,6 +32,7 @@ void display() {
     int AllLineLength = to_string(gLines).size()+1;
     string lineNumberString;
     bool nowComment = false;
+    bool nowString = false;
     bool nowConsecutiveComment = false;
     
     
@@ -106,6 +107,11 @@ void display() {
         else {
             // if the colour options was set
             switch (*p) {
+	        	case '"': {
+                    nowString = !nowString;
+		            tokenPaint(&nowToken, &tokenCounter, 1, SP_RESERVED);
+	        	    break;
+	        	}
                 case '<':
                 case '>':
                 case '+':
@@ -138,6 +144,14 @@ void display() {
                         break;
                     }
 
+                    if (nowString) {
+                        if (*p == '"' || *p == '\'') 
+                            nowString = false;
+                        attrset(COLOR_PAIR(SP_RESERVED));
+                        break;
+                    }
+
+
                     if (!isdigit(*p)) {
                         vector<Token> vec = initPredictiveTransform();
                         for (auto v : vec) {
@@ -148,10 +162,8 @@ void display() {
 
                             if (split_token(gBuf, gPageEnd, v.word.c_str(), v.word.size()) ||
                                 (nowToken == v.type && tokenCounter > 0)) {
-                                if (v.type == COMMENT)
-                                    nowComment = true;
-                                if (v.type == CONSECUTIVECOMMENT)
-                                    nowConsecutiveComment = true;
+                                    if (v.type == COMMENT)	nowComment = !nowComment;
+                                    if (v.type == CONSECUTIVECOMMENT) nowConsecutiveComment = true;
                                 tokenPaint(&nowToken, &tokenCounter, v.word.size(), v.type);
                                 break;
                             }

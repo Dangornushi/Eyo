@@ -902,8 +902,6 @@ void run() {
 
         if (can_change_color() == true && has_colors() == true) backChange();
 
-        assume_default_colors(0x00, 0x00);
-
         string nt;
 
         for (auto data : gBuf) {

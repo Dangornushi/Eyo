@@ -10,13 +10,9 @@ bool find(const string s, const vector<Token> v) {
 
 
 bool split_token(vector<char> v, int i, const char *word, int index) {
-    //clear();
-    //printw("%s", word);
     for (int j = 0; j < index; j++)
         if (v.at(i+j) != word[j])
             return false;
-    //refresh();
-    //exit(0);
     return true;
 }
 

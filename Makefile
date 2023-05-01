@@ -8,7 +8,7 @@ CC     =  g++ $(CFLAGS)
 
 $(PRG) : $(OBJ)
 	$(CC) -o $@ $^ $(LFLAGS)
-	cp build/eyo /usr/local/bin/.
+	sudo cp build/eyo /usr/local/bin/.
 
 .cpp.o:
 	$(CC) -c $<

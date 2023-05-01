@@ -9,6 +9,7 @@ short B;
 
 int RGB_buf = 4;  // 215686274509802;
 int buf_2 = 6;
+int now_comment = 0;
 
 #define BACK 0
 
