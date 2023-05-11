@@ -392,21 +392,19 @@ void commandLineLs() {
 }
 
 string inputBox() {
-
-	string runCommandBuf;
-            
+    string runCommandBuf; 
     for (int ch;; display(), savetty()) {
-	    if ((ch = getch()) == kESC)
+	if ((ch = getch()) == kESC)
             break;
-        else if (runCommandBuf.length() > 0 && (ch == kBS || ch == kDEL)) {
-        	runCommandBuf.pop_back();
-        }
-            	
-		else {
-            runCommandBuf += ch;
-        	if (ch == '\n') break;
-        }
-        commandLineWord = runCommandBuf;
+	else if (runCommandBuf.length() > 0 && (ch == kBS || ch == kDEL)) {
+            runCommandBuf.pop_back();
+	}
+
+	else {
+	    runCommandBuf += ch;	
+	    if (ch == '\n') break;
+	}
+	commandLineWord = runCommandBuf;
     }
     
     return runCommandBuf;
@@ -866,7 +864,7 @@ unordered_map<char, void (*)()> gAction = {
     {'H', gotoUp},
     {'L', gotoDown},
     {'f', commandMode},
-    {':', commandMode},
+    {';', commandMode},
     {' ', commandMode},
     {'d', del},
     {'c', lineBegin},
